@@ -54,7 +54,7 @@
 </template>
 
 <script setup>
-// import axios from "../utils/axios";
+import axios from "../utils/axios";
 
 const data = {
     userName: "",
@@ -63,16 +63,17 @@ const data = {
 };
 
 // Login function
-const userLogin = () => {
-    // try {
-    //     const res = axios.post(`/user/login`, {
-    //         username: data.userName,
-    //         password: data.passWord,
-    //     });
-    //     console.log(res);
-    // } catch (error) {
-    //     console.log(error);
-    //     // data.loginError = error.response.data.message;
-    // }
+const userLogin = async () => {
+    try {
+        const res = await axios.post(`/user/login`, {
+            username: data.userName,
+            password: data.passWord,
+        });
+        console.log(res);
+        location.href = "/";
+    } catch (error) {
+        console.log(error);
+        // data.loginError = error.response.data.message;
+    }
 };
 </script>

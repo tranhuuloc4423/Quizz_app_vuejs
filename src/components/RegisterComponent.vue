@@ -68,7 +68,7 @@
 </template>
 
 <script setup>
-// import axios from "../utils/axios";
+import axios from "../utils/axios";
 const data = {
     userName: "",
     passWord: "",
@@ -78,14 +78,15 @@ const data = {
 
 // Register function
 const userRegister = async () => {
-    // try {
-    //     const res = axios.post(`/user/register`, {
-    //         username: data.userName,
-    //         password: data.passWord,
-    //     });
-    //     console.log(res);
-    // } catch (error) {
-    //     console.log(error);
-    // }
+    try {
+        const res = await axios.post(`/user/register`, {
+            username: data.userName,
+            password: data.passWord,
+        });
+        console.log(res);
+        location.href = "/login";
+    } catch (error) {
+        console.log(error);
+    }
 };
 </script>

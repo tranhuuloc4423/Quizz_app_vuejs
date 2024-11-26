@@ -45,7 +45,7 @@
                     type="radio"
                     :value="choiceIndex"
                     v-model="localQuestion.correctChoiceIndex"
-                    class="text-green-600 p-2 peer h-5 w-5 cursor-pointer appearance-none rounded-full border border-slate-300 checked:border-green-400 transition-all"
+                    class="text-green-600 p-2"
                 />
                 <span>Correct</span>
             </label>
