@@ -3,6 +3,8 @@ import LoginComponent from "../components/LoginComponent.vue";
 import RegisterComponent from "../components/RegisterComponent.vue";
 import HomeComponent from "../components/HomeComponent.vue";
 import QuizBuilderComponent from "../components/QuizBuilderComponent.vue";
+import ManageQuizComponent from "../components/ManageQuizComponent.vue";
+import TakeQuizComponent from "../components/TakeQuizComponent.vue";
 
 const routes = [
     {
@@ -27,6 +29,17 @@ const routes = [
         component: QuizBuilderComponent,
     },
     {
+        path: "/manage-quiz",
+        name: "ManageQuizComponent",
+        component: ManageQuizComponent,
+    },
+    {
+        path: "/take-quiz/:id",
+        name: "TakeQuizComponent",
+        component: TakeQuizComponent,
+        props: true,
+    },
+    {
         path: "/:pathMatch(.*)*",
         redirect: "/",
     },
@@ -39,7 +52,7 @@ const router = createRouter({
 
 // Middleware kiểm tra đăng nhập
 router.beforeEach((to, from, next) => {
-    const isAuthenticated = localStorage.getItem("auth"); // Hoặc kiểm tra token từ store
+    const isAuthenticated = localStorage.getItem("QuizAuth"); // Hoặc kiểm tra token từ store
 
     if (to.meta.requiresAuth && !isAuthenticated) {
         // Nếu cần đăng nhập mà chưa đăng nhập, điều hướng về trang login

@@ -14,13 +14,10 @@
 
             <!-- Delete Question Button -->
             <button
-                @click="$emit('remove-question', index)"
+                @click="$emit('remove-question', localQuestion.id)"
                 class="flex items-center justify-center"
             >
-                <span
-                    class="text-red-500 hover:text-red-700 text-4xl flex items-center justify-center"
-                    >&times;</span
-                >
+                <font-awesome-icon icon="xmark" color="red" size="2x" />
             </button>
         </div>
 
@@ -44,7 +41,8 @@
                 <input
                     type="radio"
                     :value="choiceIndex"
-                    v-model="localQuestion.correctChoiceIndex"
+                    :checked="choice.correct"
+                    @change="setCorrectAnswer(choiceIndex)"
                     class="text-green-600 p-2"
                 />
                 <span>Correct</span>
@@ -55,20 +53,7 @@
                 v-if="localQuestion.choices.length > 2"
                 @click="removeChoice(choiceIndex)"
             >
-                <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    class="h-5 w-5"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                >
-                    <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M6 18L18 6M6 6l12 12"
-                    />
-                </svg>
+                <font-awesome-icon icon="xmark" size="2x" />
             </button>
         </div>
 
@@ -99,28 +84,40 @@ export default {
     },
     data() {
         return {
-            localQuestion: {
-                ...this.question,
-                correctChoiceIndex: this.question.correctChoiceIndex || null,
-            }, // Ensure correctChoiceIndex is initialized
+            localQuestion: JSON.parse(JSON.stringify(this.question)), // Deep clone to avoid mutating parent
         };
     },
     methods: {
         addChoice() {
             if (this.localQuestion.choices.length < 4) {
                 this.localQuestion.choices.push({ text: "", correct: false });
-                this.$emit("update-question", this.index, this.localQuestion);
+                this.emitUpdatedQuestion();
             }
         },
         removeChoice(index) {
             this.localQuestion.choices.splice(index, 1);
+            this.emitUpdatedQuestion();
+        },
+        removeQuestion(index) {
+            // Kiểm tra xem index có hợp lệ không
+            if (index >= 0 && index < this.quiz.questions.length) {
+                this.quiz.questions.splice(index, 1);
+            }
+        },
+        setCorrectAnswer(choiceIndex) {
+            this.localQuestion.choices.forEach((choice, idx) => {
+                choice.correct = idx === choiceIndex;
+            });
+            this.emitUpdatedQuestion();
+        },
+        emitUpdatedQuestion() {
             this.$emit("update-question", this.index, this.localQuestion);
         },
     },
     watch: {
         localQuestion: {
-            handler(newVal) {
-                this.$emit("update-question", this.index, newVal);
+            handler() {
+                this.emitUpdatedQuestion();
             },
             deep: true,
         },
