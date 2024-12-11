@@ -27,9 +27,7 @@
             </div>
 
             <!-- Main Content -->
-            <div
-                class="overflow-y-scroll h-[800px] border border-[#c5c5c5] rounded-lg shadow-lg p-6"
-            >
+            <div class="">
                 <div v-if="!auth">
                     <h1 class="text-5xl font-extrabold text-black mb-4">
                         Learn 10x <span class="text-green-800">Faster!</span>
@@ -52,12 +50,7 @@
                         class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6"
                     >
                         <div v-for="(quiz, index) in quizzes" :key="index">
-                            <QuizBoxComponent
-                                :quiz="quiz"
-                                @edit-quiz="handleEdit"
-                                @remove-quiz="handleRemove"
-                                @view-quiz="handleView"
-                            />
+                            <QuizBoxComponent :quiz="quiz" />
                         </div>
 
                         <!-- phần box thêm quiz -->

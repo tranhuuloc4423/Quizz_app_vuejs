@@ -29,9 +29,10 @@ const routes = [
         component: QuizBuilderComponent,
     },
     {
-        path: "/manage-quiz",
+        path: "/manage-quiz/:id",
         name: "ManageQuizComponent",
         component: ManageQuizComponent,
+        props: true,
     },
     {
         path: "/take-quiz/:id",

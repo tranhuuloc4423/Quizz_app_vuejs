@@ -3,7 +3,7 @@
         class="border border-[#c5c5c5] rounded-lg shadow-md p-4 bg-white hover:scale-[0.98] transition-all"
     >
         <div
-            class="w-full h-[150px] mx-auto bg-green-600 rounded-md flex flex-col items-center justify-between px-4 py-2"
+            class="w-full h-[150px] mx-auto bg-green-500 rounded-md flex flex-col items-center justify-between px-4 py-2"
         >
             <v-menu>
                 <template v-slot:activator="{ props }">
@@ -51,6 +51,7 @@
         </div>
         <div class="flex flex-col justify-between items-center">
             <v-btn
+                @click="onView"
                 class="w-fit mt-4 px-4 py-2 bg-green-600 text-white rounded shadow hover:bg-green-700"
             >
                 View Quiz
@@ -75,7 +76,7 @@
                                 class="border rounded-md"
                             ></vue-qr>
                             <div>Quiz: {{ quiz.title }}</div>
-                            <button @click="CopyUrl">Copy link</button>
+                            <v-btn @click="CopyUrl" text="Copy link"></v-btn>
                         </div>
 
                         <v-card-actions>
@@ -104,29 +105,25 @@ export default {
         },
     },
     methods: {
-        methods: {
-            onEdit() {
-                // Thực hiện hành động khi nhấn Edit
-                this.$emit("edit-quiz", this.quiz);
-            },
-            onRemove() {
-                // Thực hiện hành động khi nhấn Remove
-                this.$emit("remove-quiz", this.quiz);
-            },
-            onView() {
-                // Thực hiện hành động khi nhấn View Quiz
-                this.$emit("view-quiz", this.quiz);
-            },
-            async CopyUrl() {
-                try {
-                    await navigator.clipboard.writeText(
-                        `localhost:8080/take-quiz/${this.quiz.title}`
-                    );
-                    alert("URL copied to clipboard!"); // Thông báo thành công
-                } catch (err) {
-                    console.error("Failed to copy: ", err); // Xử lý lỗi
-                }
-            },
+        onEdit() {
+            // Thực hiện hành động khi nhấn Edit
+            this.$emit("edit-quiz", this.quiz);
+        },
+        onRemove() {
+            // Thực hiện hành động khi nhấn Remove
+            this.$emit("remove-quiz", this.quiz);
+        },
+        onView() {
+            location.href = `/manage-quiz/${this.quiz._id}`;
+        },
+        async CopyUrl() {
+            try {
+                await navigator.clipboard.writeText(
+                    `localhost:8080/take-quiz/${this.quiz._id}`
+                );
+            } catch (err) {
+                console.error("Failed to copy: ", err); // Xử lý lỗi
+            }
         },
     },
 };

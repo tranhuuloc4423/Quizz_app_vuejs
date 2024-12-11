@@ -1,65 +1,76 @@
 <template>
-    <v-card flat>
-        <v-card-title class="d-flex align-center pe-2" title="Quiz Management">
-            Find a Quiz
+    <div class="w-full flex flex-col gap-4 items-center">
+        <h1 class="text-4xl font-semibold mt-4">Quizzes Table</h1>
 
-            <v-spacer></v-spacer>
+        <div class="w-2/3 mx-auto">
+            <v-card flat>
+                <v-card-title
+                    class="d-flex align-center pe-2"
+                    title="Quiz Management"
+                >
+                    Find a Quiz
 
-            <v-text-field
-                v-model="search"
-                density="compact"
-                label="Search"
-                prepend-inner-icon="mdi-magnify"
-                variant="solo-filled"
-                flat
-                hide-details
-                single-line
-            ></v-text-field>
-        </v-card-title>
+                    <v-spacer></v-spacer>
 
-        <v-divider></v-divider>
-        <v-data-table
-            v-model:search="search"
-            :filter-keys="['title']"
-            :items="items"
-            style="border: 1px solid; border-collapse: separate"
-        >
-            <template v-slot:[`item.title`]="{ item }">
-                <div class="text-center">{{ item.title }}</div>
-            </template>
+                    <v-text-field
+                        v-model="search"
+                        density="compact"
+                        label="Search"
+                        prepend-inner-icon="mdi-magnify"
+                        variant="solo-filled"
+                        flat
+                        hide-details
+                        single-line
+                    ></v-text-field>
+                </v-card-title>
 
-            <template v-slot:[`item.questions`]="{ item }">
-                <div class="text-center">{{ item.questions }}</div>
-            </template>
+                <v-divider></v-divider>
+                <v-data-table
+                    v-model:search="search"
+                    :filter-keys="['title']"
+                    :items="items"
+                    style="border: 1px solid; border-collapse: separate"
+                >
+                    <template v-slot:[`item.title`]="{ item }">
+                        <div class="text-center">{{ item.title }}</div>
+                    </template>
 
-            <template v-slot:[`item.participants`]="{ item }">
-                <div class="text-center">{{ item.participants }}</div>
-            </template>
+                    <template v-slot:[`item.questions`]="{ item }">
+                        <div class="text-center">{{ item.questions }}</div>
+                    </template>
 
-            <template v-slot:[`item.correctRate`]="{ item }">
-                <div class="text-center">
-                    <v-chip
-                        :color="item.correctRate > 50 ? 'green' : 'red'"
-                        :text="item.correctRate"
-                        class="text-uppercase"
-                        size="small"
-                        label
-                    ></v-chip>
-                </div>
-            </template>
-            <template v-slot:[`item.incorrectRate`]="{ item }">
-                <div class="text-center">
-                    <v-chip
-                        :color="item.incorrectRate > 50 ? 'green' : 'red'"
-                        :text="item.incorrectRate"
-                        class="text-uppercase"
-                        size="small"
-                        label
-                    ></v-chip>
-                </div>
-            </template>
-        </v-data-table>
-    </v-card>
+                    <template v-slot:[`item.participants`]="{ item }">
+                        <div class="text-center">{{ item.participants }}</div>
+                    </template>
+
+                    <template v-slot:[`item.correctRate`]="{ item }">
+                        <div class="text-center">
+                            <v-chip
+                                :color="item.correctRate > 50 ? 'green' : 'red'"
+                                :text="item.correctRate"
+                                class="text-uppercase"
+                                size="small"
+                                label
+                            ></v-chip>
+                        </div>
+                    </template>
+                    <template v-slot:[`item.incorrectRate`]="{ item }">
+                        <div class="text-center">
+                            <v-chip
+                                :color="
+                                    item.incorrectRate > 50 ? 'green' : 'red'
+                                "
+                                :text="item.incorrectRate"
+                                class="text-uppercase"
+                                size="small"
+                                label
+                            ></v-chip>
+                        </div>
+                    </template>
+                </v-data-table>
+            </v-card>
+        </div>
+    </div>
 </template>
 
 <script>
