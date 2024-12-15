@@ -1,6 +1,6 @@
 import axios from "axios";
 
-let auth = localStorage.getItem("auth");
+let auth = localStorage.getItem("QuizAuth");
 if (auth == "") location = "http://localhost:8080/login";
 
 const instance = axios.create({

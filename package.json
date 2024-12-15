@@ -20,6 +20,7 @@
     "vue": "^3.2.13",
     "vue-qr": "^4.0.9",
     "vue-router": "^4.4.5",
+    "vue3-toastify": "^0.2.5",
     "vuetify": "^3.0.0-beta.0",
     "webfontloader": "^1.0.0",
     "xlsx": "^0.18.5"

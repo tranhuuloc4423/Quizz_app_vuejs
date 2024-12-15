@@ -40,27 +40,31 @@
                 </div>
 
                 <!-- Submit Button -->
-                <button
+                <v-btn
                     @click="userLogin"
-                    class="w-full py-2 bg-green-600 text-white font-semibold rounded hover:bg-green-700"
+                    variant="tonal"
+                    color="green"
+                    width="100%"
                 >
                     Submit
-                </button>
+                </v-btn>
 
                 <!-- Register Button -->
                 <div class="w-full flex justify-between items-center py-2">
-                    <div
+                    <v-btn
+                        variant="outlined"
+                        color="green"
                         @click="$router.push('/')"
-                        class="cursor-pointer border border-green-600 text-green-600 px-2 py-1 text-lg rounded hover:text-green-600"
                     >
                         Home
-                    </div>
-                    <div
+                    </v-btn>
+                    <v-btn
+                        variant="outlined"
+                        color="green"
                         @click="$router.push('/register')"
-                        class="cursor-pointer border border-green-600 text-green-600 px-2 py-1 text-lg rounded hover:text-green-600"
                     >
                         Register
-                    </div>
+                    </v-btn>
                 </div>
 
                 <!-- Error Message -->
@@ -70,30 +74,19 @@
             </form>
         </div>
     </div>
-
-    <CustomToast v-if="data.toast.show" v-bind="data.toast" />
 </template>
 
 <script setup>
 import { reactive } from "vue";
 import axios from "../utils/axios";
-import CustomToast from "./CustomToast.vue";
+import { toast } from "vue3-toastify";
+import "vue3-toastify/dist/index.css";
 
 // Reactive state
 const data = reactive({
     userName: "",
     passWord: "",
-    loginError: "",
-    toast: { show: false, message: "", state: "", duration: 5000 },
 });
-
-// Show toast function
-const showToast = (message, state = "success", duration = 5000) => {
-    data.toast = { show: true, message, state, duration };
-    setTimeout(() => {
-        data.toast.show = false;
-    }, duration);
-};
 
 // Login function
 const userLogin = async () => {
@@ -103,14 +96,16 @@ const userLogin = async () => {
             password: data.passWord,
         });
         console.log(res);
+        toast.success("Login successful!");
         localStorage.setItem("QuizAuth", res.data.token);
         localStorage.setItem("QuizUser", JSON.stringify(res.data.user));
-        showToast("Login successful!", "success");
-        location.href = "/";
+        setTimeout(() => {
+            this.$router.push("/");
+        }, 1000);
     } catch (error) {
         console.error(error);
         const errorMessage = error.response?.data?.error || "Login failed!";
-        showToast(errorMessage, "error");
+        toast.error(errorMessage);
     }
 };
 </script>

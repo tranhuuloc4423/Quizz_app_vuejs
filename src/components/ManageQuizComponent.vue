@@ -25,28 +25,30 @@
                 </v-card-title>
 
                 <v-divider></v-divider>
-                <v-data-table
-                    v-model:search="search"
-                    :filter-keys="['title']"
-                    :items="items"
-                    style="border: 1px solid; border-collapse: separate"
+
+                <div
+                    v-if="loading"
+                    class="w-full mt-[100px] flex justify-center items-center"
                 >
-                    <template v-slot:[`item.title`]="{ item }">
-                        <div class="text-center">{{ item.title }}</div>
-                    </template>
-
-                    <template v-slot:[`item.questions`]="{ item }">
-                        <div class="text-center">{{ item.questions }}</div>
-                    </template>
-
-                    <template v-slot:[`item.participants`]="{ item }">
-                        <div class="text-center">{{ item.participants }}</div>
-                    </template>
-
+                    <v-progress-circular
+                        color="green"
+                        size="64"
+                        indeterminate
+                    ></v-progress-circular>
+                </div>
+                <v-data-table
+                    :headers="headers"
+                    :items="items"
+                    :search="search"
+                    style="border: 1px solid; border-collapse: collapse';"
+                    v-if="!loading"
+                >
                     <template v-slot:[`item.correctRate`]="{ item }">
-                        <div class="text-center">
+                        <div>
                             <v-chip
-                                :color="item.correctRate > 50 ? 'green' : 'red'"
+                                :color="
+                                    item.correctRate >= 50 ? 'green' : 'red'
+                                "
                                 :text="item.correctRate"
                                 class="text-uppercase"
                                 size="small"
@@ -55,10 +57,10 @@
                         </div>
                     </template>
                     <template v-slot:[`item.incorrectRate`]="{ item }">
-                        <div class="text-center">
+                        <div>
                             <v-chip
                                 :color="
-                                    item.incorrectRate > 50 ? 'green' : 'red'
+                                    item.incorrectRate >= 50 ? 'green' : 'red'
                                 "
                                 :text="item.incorrectRate"
                                 class="text-uppercase"
@@ -74,118 +76,59 @@
 </template>
 
 <script>
+import axios from "../utils/axios";
 export default {
     data() {
         return {
             search: "",
+            loading: false,
+            headers: [
+                {
+                    align: "center",
+                    key: "name",
+                    sortable: false,
+                },
+                { key: "participant", title: "Participant" },
+                { key: "questions", title: "Questions" },
+                { key: "correctRate", title: "CorrectRate" },
+                { key: "incorrectRate", title: "InCorrectRate" },
+            ],
             items: [
                 {
-                    title: "React Quiz",
-                    questions: 10,
-                    participants: 10,
-                    correctRate: 40,
-                    incorrectRate: 60,
-                },
-                {
-                    title: "Vue.js Basics",
-                    questions: 12,
-                    participants: 15,
-                    correctRate: 65,
-                    incorrectRate: 35,
-                },
-                {
-                    title: "JavaScript Fundamentals",
-                    questions: 20,
-                    participants: 25,
-                    correctRate: 55,
-                    incorrectRate: 45,
-                },
-                {
-                    title: "CSS Mastery",
-                    questions: 15,
-                    participants: 30,
-                    correctRate: 70,
-                    incorrectRate: 30,
-                },
-                {
-                    title: "HTML5 Knowledge",
-                    questions: 10,
-                    participants: 20,
-                    correctRate: 80,
-                    incorrectRate: 20,
-                },
-                {
-                    title: "TypeScript Basics",
-                    questions: 12,
-                    participants: 18,
-                    correctRate: 50,
-                    incorrectRate: 50,
-                },
-                {
-                    title: "Node.js Essentials",
-                    questions: 10,
-                    participants: 22,
-                    correctRate: 45,
-                    incorrectRate: 55,
-                },
-                {
-                    title: "Python for Beginners",
-                    questions: 20,
-                    participants: 28,
-                    correctRate: 60,
-                    incorrectRate: 40,
-                },
-                {
-                    title: "SQL Queries",
-                    questions: 18,
-                    participants: 25,
-                    correctRate: 75,
-                    incorrectRate: 25,
-                },
-                {
-                    title: "PHP Quiz",
-                    questions: 15,
-                    participants: 12,
-                    correctRate: 35,
-                    incorrectRate: 65,
-                },
-                {
-                    title: "Blockchain Basics",
-                    questions: 10,
-                    participants: 14,
-                    correctRate: 55,
-                    incorrectRate: 45,
-                },
-                {
-                    title: "Java Master Quiz",
-                    questions: 25,
-                    participants: 35,
-                    correctRate: 60,
-                    incorrectRate: 40,
-                },
-                {
-                    title: "C++ Problem Solving",
-                    questions: 18,
-                    participants: 20,
-                    correctRate: 65,
-                    incorrectRate: 35,
-                },
-                {
-                    title: "Rust Language Intro",
-                    questions: 10,
-                    participants: 8,
-                    correctRate: 50,
-                    incorrectRate: 50,
-                },
-                {
-                    title: "Django Basics",
-                    questions: 12,
-                    participants: 16,
-                    correctRate: 40,
-                    incorrectRate: 60,
+                    participant: "name",
+                    questions: 0,
+                    correctRate: 0,
+                    incorrectRate: 0,
                 },
             ],
         };
+    },
+    methods: {
+        async getQuizResults() {
+            try {
+                this.loading = true;
+                const res = await axios.get(
+                    `/quiz-result/quiz/${this.$route.params.id}`
+                );
+                console.log(res.data);
+                this.items = this.convertQuizResultFromDB(res.data);
+                this.loading = false;
+            } catch (error) {
+                this.loading = false;
+                console.log(error);
+            }
+        },
+        convertQuizResultFromDB(data) {
+            return data.map((item) => ({
+                participant: item.participant.name,
+                questions: item.answers.length,
+                correctRate: item.correctRate,
+                incorrectRate: item.incorrectRate,
+            }));
+        },
+    },
+    mounted() {
+        this.getQuizResults();
     },
 };
 </script>

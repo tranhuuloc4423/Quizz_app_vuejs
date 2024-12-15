@@ -1,14 +1,21 @@
 <template>
     <div class="text-center h-screen flex pt-10 justify-center bg-gray-100">
-        <div class="w-full max-w-screen-xl">
+        <div class="w-full max-w-screen-xl mx-4 md:px-0 lg:px-0 xl:px-0">
             <!-- header -->
             <div class="flex items-center justify-between mb-6">
                 <!-- Logo -->
-                <div class="flex items-center">
+                <div class="flex items-center gap-4">
                     <!-- logo here -->
                     <h3 class="ml-3 text-2xl font-bold text-black">
                         Quizz<span class="text-green-800">World</span>
                     </h3>
+                    <v-btn
+                        v-if="auth"
+                        @click="$router.push('/create-quiz')"
+                        variant="outlined"
+                        color="green"
+                        >New Quiz</v-btn
+                    >
                 </div>
 
                 <!-- Login Button -->
@@ -17,12 +24,9 @@
                         <span class="">Welcome back</span>
                         {{ user?.username }} !
                     </div>
-                    <button
-                        @click="handleAuth"
-                        class="px-4 py-2 border border-green-600 text-green-600 rounded hover:bg-green-50"
-                    >
+                    <v-btn @click="handleAuth" variant="outlined" color="green">
                         {{ auth ? "Logout" : "Login" }}
-                    </button>
+                    </v-btn>
                 </div>
             </div>
 
@@ -47,26 +51,25 @@
 
                 <div v-if="auth">
                     <div
+                        v-if="loading"
+                        class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6"
+                    >
+                        <v-skeleton-loader
+                            v-for="n in 8"
+                            :key="n"
+                            class="mx-auto border"
+                            min-width="300px"
+                            type="image, article, actions"
+                        ></v-skeleton-loader>
+                    </div>
+                    <div
                         class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6"
                     >
                         <div v-for="(quiz, index) in quizzes" :key="index">
-                            <QuizBoxComponent :quiz="quiz" />
-                        </div>
-
-                        <!-- phần box thêm quiz -->
-                        <div
-                            @click="$router.push('/create-quiz')"
-                            class="cursor-pointer flex flex-col items-center justify-between border border-[#c5c5c5] rounded-lg shadow-lg p-6"
-                        >
-                            <div></div>
-                            <font-awesome-icon
-                                icon="plus"
-                                size="4x"
-                                color="#c5c5c5"
+                            <QuizBoxComponent
+                                :quiz="quiz"
+                                @remove-quiz="removeQuiz(quiz._id)"
                             />
-                            <div class="text-2xl font-semibold text-[#c5c5c5]">
-                                Add a new Quiz
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -77,27 +80,29 @@
     <!-- dialog -->
     <div>
         <v-dialog v-model="dialog" max-width="400" persistent>
-            <v-card text="Bạn có chắc chắn muốn đăng xuất !" title="Đăng xuất">
+            <v-card text="Do you want to logout !" title="Logout">
                 <template v-slot:actions>
                     <v-spacer></v-spacer>
-                    <div
+                    <v-btn
                         @click="dialog = false"
-                        class="cursor-pointer border border-red-600 text-red-600 px-2 py-1 text-lg rounded hover:bg-red-200"
+                        variant="outlined"
+                        color="red"
                     >
-                        Huỷ
-                    </div>
+                        Cancel
+                    </v-btn>
 
-                    <div
+                    <v-btn
                         @click="
                             () => {
                                 dialog = false;
                                 handleLogout();
                             }
                         "
-                        class="cursor-pointer border border-green-600 text-green-600 px-2 py-1 text-lg rounded hover:bg-green-200"
+                        variant="outlined"
+                        color="green"
                     >
-                        Xác nhận
-                    </div>
+                        confirm
+                    </v-btn>
                 </template>
             </v-card>
         </v-dialog>
@@ -107,6 +112,8 @@
 <script>
 import axios from "../utils/axios";
 import QuizBoxComponent from "./QuizBoxComponent.vue";
+import { toast } from "vue3-toastify";
+import "vue3-toastify/dist/index.css";
 
 export default {
     components: { QuizBoxComponent },
@@ -114,25 +121,9 @@ export default {
         return {
             auth: localStorage.getItem("QuizAuth"),
             user: JSON.parse(localStorage.getItem("QuizUser")),
-            quizzes: [
-                // {
-                //     _id: 0,
-                //     title: "React Quiz",
-                //     questions: 10,
-                //     correctRate: 0,
-                //     incorrectRate: 0,
-                //     participants: 0,
-                // },
-                // {
-                //     _id: 1,
-                //     title: "Vue Quiz",
-                //     questions: 6,
-                //     correctRate: 0,
-                //     incorrectRate: 0,
-                //     participants: 0,
-                // },
-            ],
+            quizzes: [],
             dialog: false,
+            loading: false,
         };
     },
     methods: {
@@ -153,11 +144,26 @@ export default {
         handleLogout() {
             localStorage.removeItem("QuizAuth");
             location.href = "/";
+            toast.success("Logout successful!");
+        },
+        async removeQuiz(id) {
+            try {
+                const res = await axios.delete(`/quiz/${id}`);
+                console.log(res);
+                this.getQuizes();
+                toast.success("Remove Quiz successful!");
+            } catch (error) {
+                const errorMessage = error.response?.data?.error;
+                console.log(error);
+                toast.success(errorMessage);
+            }
         },
         async getQuizes() {
             try {
-                const res = await axios.get("/quiz");
+                this.loading = true;
+                const res = await axios.get(`/quiz/author/${this.user._id}`);
                 this.quizzes = res.data;
+                this.loading = false;
             } catch (error) {
                 console.log(error);
             }

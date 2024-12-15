@@ -1,22 +1,21 @@
 <template>
     <div class="w-full h-full">
-        <div class="mx-auto p-4 max-w-5xl">
-            <h2 class="text-center font-bold text-2xl mb-6">Quiz Builder</h2>
+        <LoadingOverlay :loading="loading" />
 
-            <!-- <CustomToast v-if="toast.show" v-bind="toast" /> -->
+        <div class="mx-auto p-4 max-w-5xl" v-if="!loading">
+            <h2 class="text-center font-bold text-2xl mb-6">
+                {{ isEdit ? "Edit Quiz" : "Create New Quiz" }}
+            </h2>
 
             <!-- Swap Mode Button -->
-            <div class="flex justify-center mb-6">
-                <button
-                    class="px-4 py-2 bg-blue-600 text-white font-semibold rounded hover:bg-blue-700"
-                    @click="swapMode"
-                >
+            <div class="flex justify-center mb-6" v-if="!isEdit">
+                <v-btn variant="outlined" color="green" @click="swapMode">
                     {{
                         isBulkMode
-                            ? "Switch to Single Question Mode"
+                            ? "Switch to Single Mode"
                             : "Switch to Bulk Mode"
                     }}
-                </button>
+                </v-btn>
             </div>
 
             <div class="mb-5 border border-gray-300 rounded-lg p-4">
@@ -24,7 +23,7 @@
                     <span class="text-green-600 text-xl">
                         <i class="mdi mdi-card-text-outline"></i>
                     </span>
-                    <h3 class="ml-3 text-lg font-semibold">Quiz Name:</h3>
+                    <h3 class="ml-3 text-lg font-semibold">Quiz Title:</h3>
                 </div>
                 <input
                     type="text"
@@ -36,10 +35,19 @@
 
             <!-- Bulk Add Questions -->
             <div
-                v-if="isBulkMode"
+                v-if="!isEdit && isBulkMode"
                 class="mb-5 border border-gray-300 rounded-lg p-4"
             >
-                <h3 class="text-lg font-semibold mb-3">Bulk Add Questions</h3>
+                <div class="flex justify-between items-center pb-2">
+                    <h3 class="text-lg font-semibold">Bulk Questions</h3>
+                    <v-btn
+                        variant="outlined"
+                        color="green"
+                        @click="insertSampleFormat"
+                    >
+                        Insert Sample Format
+                    </v-btn>
+                </div>
                 <textarea
                     contenteditable="true"
                     v-model="bulkQuestions"
@@ -47,12 +55,6 @@
                     rows="6"
                     class="w-full h-[300px] p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-600"
                 ></textarea>
-                <button
-                    class="mt-2 w-full py-2 bg-gray-600 text-white font-semibold rounded hover:bg-gray-700"
-                    @click="insertSampleFormat"
-                >
-                    Insert Sample Format
-                </button>
             </div>
 
             <!-- Single Question Input Mode -->
@@ -87,19 +89,17 @@
             </div>
 
             <!-- Save Button -->
-            <div class="flex justify-between">
-                <button
-                    class="w-fit px-4 py-3 mt-5 bg-green-600 text-white font-semibold rounded hover:bg-green-700"
+            <div class="flex justify-between mt-4">
+                <v-btn
+                    variant="outlined"
+                    color="green"
                     @click="$router.push('/')"
                 >
-                    Back
-                </button>
-                <button
-                    class="w-fit px-4 py-3 mt-5 bg-green-600 text-white font-semibold rounded hover:bg-green-700"
-                    @click="saveQuiz"
-                >
-                    Save
-                </button>
+                    Home
+                </v-btn>
+                <v-btn variant="outlined" color="green" @click="saveQuiz()">
+                    {{ isEdit ? "Update" : "Save" }}
+                </v-btn>
             </div>
         </div>
     </div>
@@ -108,12 +108,14 @@
 <script>
 import axios from "../utils/axios";
 import QuestionBuilderComponent from "./QuestionBuilderComponent.vue";
-// import CustomToast from "./CustomToast.vue";
+import LoadingOverlay from "./LoadingOverlay.vue";
+import { toast } from "vue3-toastify";
+import "vue3-toastify/dist/index.css";
 
 export default {
     components: {
-        // CustomToast,
         QuestionBuilderComponent,
+        LoadingOverlay,
     },
     data() {
         return {
@@ -132,138 +134,225 @@ export default {
             },
             bulkQuestions: "",
             toast: { show: false, message: "", state: "", duration: 5000 },
+            isEdit: false,
+            quizId: null,
+            loading: false,
         };
     },
     methods: {
-        swapMode() {
-            this.isBulkMode = !this.isBulkMode;
+        // ===== Utility Functions =====
+        resetQuestions() {
+            this.quiz.questions = [];
         },
-        showToast(message, state = "success") {
-            this.toast = { show: true, message, state, duration: 5000 };
-            setTimeout(() => {
-                this.toast.show = false;
-            }, this.toast.duration);
-        },
-        addQuestion() {
-            this.quiz.questions.push({
-                id: Date.now(), // ID duy nhất
+        createNewQuestion() {
+            return {
+                id: Date.now(), // Unique ID
                 text: "",
                 choices: [{ text: "", correct: false }],
-            });
+            };
+        },
+        findQuestionIndexById(id) {
+            return this.quiz.questions.findIndex((q) => q.id === id);
+        },
+        validateQuiz() {
+            const hasEmptyTitle = !this.quiz.name.trim();
+            const hasInvalidAnswers = this.quiz.questions.some((q) =>
+                q.choices.every((c) => !c.correct)
+            );
+            if (hasEmptyTitle) {
+                toast.warning("Please enter a title!");
+                return false;
+            }
+            if (hasInvalidAnswers) {
+                toast.warning("Please check all answers!");
+                return false;
+            }
+            return true;
+        },
+
+        // ===== Main Functions =====
+        swapMode() {
+            this.isBulkMode = !this.isBulkMode;
+            this.resetQuestions();
+        },
+        addQuestion() {
+            this.quiz.questions.push(this.createNewQuestion());
         },
         updateQuestion(index, updatedQuestion) {
-            this.quiz.questions[index] = updatedQuestion;
+            if (index >= 0) this.quiz.questions[index] = updatedQuestion;
         },
         removeQuestion(id) {
-            const index = this.quiz.questions.findIndex((q) => q.id === id);
-            if (index !== -1) {
-                this.quiz.questions.splice(index, 1);
-            }
+            const index = this.findQuestionIndexById(id);
+            if (index !== -1) this.quiz.questions.splice(index, 1);
         },
         addBulkQuestions() {
             const newQuestions = this.parseBulkQuestions();
             this.quiz.questions.push(...newQuestions);
             this.bulkQuestions = "";
         },
+
+        // ===== Parsing Functions =====
         parseBulkQuestions() {
             const lines = this.bulkQuestions.split("\n");
-            let currentQuestion = null;
             const parsedQuestions = [];
+            let currentQuestion = null;
 
             lines.forEach((line) => {
-                if (line.startsWith("q:")) {
-                    if (currentQuestion) {
-                        parsedQuestions.push(currentQuestion);
-                    }
+                const trimmedLine = line.trim();
+                if (trimmedLine.startsWith("q:")) {
+                    if (currentQuestion) parsedQuestions.push(currentQuestion);
                     currentQuestion = {
-                        text: line.replace("q:", "").trim(),
+                        text: trimmedLine.slice(2).trim(),
                         choices: [],
                     };
-                } else if (line.startsWith("correct:")) {
-                    if (currentQuestion) {
-                        const correctAnswer = line
-                            .replace("correct:", "")
-                            .trim();
-                        currentQuestion.choices.forEach((choice) => {
-                            if (choice.text === correctAnswer) {
-                                choice.correct = true;
-                            }
-                        });
-                    }
-                } else if (line.trim() !== "" && currentQuestion) {
+                } else if (
+                    currentQuestion &&
+                    trimmedLine.startsWith("correct:")
+                ) {
+                    const correctAnswer = trimmedLine.slice(8).trim();
+                    currentQuestion.choices.forEach((choice) => {
+                        if (choice.text === correctAnswer)
+                            choice.correct = true;
+                    });
+                } else if (currentQuestion && trimmedLine) {
                     currentQuestion.choices.push({
-                        text: line.trim(),
+                        text: trimmedLine,
                         correct: false,
                     });
                 }
             });
 
-            if (currentQuestion) {
-                parsedQuestions.push(currentQuestion);
-            }
-
+            if (currentQuestion) parsedQuestions.push(currentQuestion);
             return parsedQuestions;
         },
-        saveQuiz() {
-            if (this.isBulkMode && this.bulkQuestions.trim()) {
+        convertQuestionsToBulk(questions) {
+            return questions
+                .map(({ text, choices }) => {
+                    const answers = choices.map((c) => c.text).join("\n");
+                    const correctAnswer =
+                        choices.find((c) => c.correct)?.text || "";
+                    return `q: ${text}\n${answers}\ncorrect: ${correctAnswer}`;
+                })
+                .join("\n\n");
+        },
+
+        // ===== Save & Update =====
+        async saveQuiz() {
+            if (this.isEdit) return this.updateQuiz();
+
+            if (!this.isEdit && this.isBulkMode && this.bulkQuestions.trim()) {
                 this.addBulkQuestions();
             }
-            const checkAnswers = this.quiz.questions.some((q) =>
-                q.choices.every((c) => c.correct === false)
-            );
-            const checkTitle = this.quiz.name.trim() === "";
-            if (checkTitle) {
-                this.showToast("Please enter a title!", "warning");
-                return;
-            }
-            if (checkAnswers) {
-                this.showToast("Please check all answers!", "warning");
-                return;
-            }
-            console.log("Saved Quiz:", this.quiz);
-            this.saveToDb();
-        },
-        formatQuestionToDb() {
-            return this.quiz.questions.map((question) => {
-                return {
-                    questionText: question.text,
-                    answers: question.choices.map((choice) => {
-                        return {
-                            answerText: choice.text,
-                            isCorrect: choice.correct,
-                        };
-                    }),
-                };
-            });
-        },
-        async saveToDb() {
+
+            if (!this.validateQuiz()) return;
+
             try {
-                await axios.post(
-                    "/quiz/create-quiz",
-                    {
-                        title: this.quiz.name,
-                        createdBy: this.user._id,
-                        questions: this.formatQuestionToDb(),
-                    },
-                    {
-                        headers: {
-                            Authorization: `Bearer ${this.token}`,
-                        },
-                    }
-                );
-                console.log({
+                this.loading = true;
+                await axios.post("/quiz/create-quiz", {
                     title: this.quiz.name,
                     createdBy: this.user._id,
                     questions: this.formatQuestionToDb(),
                 });
-                location.href = "/";
+                toast.success("Create Quiz successful!");
+                setTimeout(() => {
+                    this.$router.push("/");
+                }, 2000);
             } catch (error) {
-                console.log(error);
+                toast.error(error.response?.data?.error);
+            } finally {
+                this.loading = false;
+            }
+        },
+        async updateQuiz() {
+            try {
+                this.loading = true;
+                const updatedData = this.formatUpdateQuestion();
+                await axios.put("/quiz/update/", {
+                    quizId: this.$route?.query.id,
+                    ...updatedData,
+                });
+                toast.success("Update Quiz successful!");
+                setTimeout(() => {
+                    this.$router.push("/");
+                }, 2000);
+            } catch (error) {
+                toast.error(error.response?.data?.error);
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        // ===== Formatting Functions =====
+        formatUpdateQuestion() {
+            return {
+                title: this.quiz.name,
+                questions: this.quiz.questions.map(({ id, text, choices }) => ({
+                    questionId: typeof id === "number" ? undefined : id,
+                    questionText: text,
+                    correctAnswer: choices.find((c) => c.correct)?.text,
+                    answers: choices.map((c) => ({
+                        answerId: c.id || undefined,
+                        answerText: c.text,
+                        isCorrect: c.correct,
+                    })),
+                })),
+            };
+        },
+        formatQuestionToDb() {
+            return this.quiz.questions.map(({ text, choices }) => ({
+                questionText: text,
+                answers: choices.map(({ text, correct }) => ({
+                    answerText: text,
+                    isCorrect: correct,
+                })),
+            }));
+        },
+        formatQuestionFromDB(data) {
+            return data.map(({ _id, questionText, answers }) => ({
+                id: _id,
+                text: questionText,
+                choices: answers.map(({ answerText, isCorrect, _id }) => ({
+                    text: answerText,
+                    correct: isCorrect,
+                    id: _id,
+                })),
+            }));
+        },
+
+        // ===== API Calls =====
+        async getQuiz() {
+            try {
+                const { data } = await axios.get(`/quiz/${this.quizId}`);
+                this.quiz.name = data.title;
+            } catch (error) {
+                console.error(error);
+            }
+        },
+        async getQuestions() {
+            try {
+                const { data } = await axios.get(
+                    `/question/quiz/${this.quizId}`
+                );
+                this.quiz.questions = this.formatQuestionFromDB(data);
+            } catch (error) {
+                console.error(error);
             }
         },
         insertSampleFormat() {
-            this.bulkQuestions = `q: What is React?\nanswer1\nanswer2\nanswer3\nanswer4\ncorrect: answer2\nq: What is Vue?\nanswer1\nanswer2\nanswer3\nanswer4\ncorrect: answer1`;
+            this.bulkQuestions = `q: What is React?\nanswer1\nanswer2\nanswer3\nanswer4\ncorrect: answer2\n\nq: What is Vue?\nanswer1\nanswer2\nanswer3\nanswer4\ncorrect: answer1`;
         },
+    },
+
+    mounted() {
+        const { id, edit } = this.$route?.query;
+        if (id && edit) {
+            this.isEdit = true;
+            this.quizId = id;
+            this.loading = true;
+            this.getQuiz();
+            this.getQuestions();
+            this.loading = false;
+        }
     },
 };
 </script>

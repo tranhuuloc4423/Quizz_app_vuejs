@@ -1,6 +1,6 @@
 <template>
     <div
-        class="border border-[#c5c5c5] rounded-lg shadow-md p-4 bg-white hover:scale-[0.98] transition-all"
+        class="border border-[#c5c5c5] rounded-lg shadow-md p-4 bg-white hover:scale-[0.99] transition-all"
     >
         <div
             class="w-full h-[150px] mx-auto bg-green-500 rounded-md flex flex-col items-center justify-between px-4 py-2"
@@ -17,11 +17,16 @@
                 </template>
 
                 <v-list>
-                    <v-list-item class="cursor-pointer hover:bg-green-500">
+                    <v-list-item
+                        @click="onEdit"
+                        class="cursor-pointer hover:bg-green-200"
+                    >
                         <font-awesome-icon icon="pen-to-square" />
                         <span class="ml-2">Edit</span>
                     </v-list-item>
-                    <v-list-item class="cursor-pointer hover:bg-green-500"
+                    <v-list-item
+                        @click="onRemove"
+                        class="cursor-pointer hover:bg-green-200"
                         ><font-awesome-icon icon="trash-can" />
                         <span class="ml-2">Remove</span>
                     </v-list-item>
@@ -34,26 +39,25 @@
             <div class="h-[28px]"></div>
         </div>
         <div class="flex flex-col gap items-start mt-2">
-            <span class="text-xl font-semibold mb-2">
+            <div class="text-xl font-semibold mb-2 nowrap w-[95%] text-left">
                 Quiz: {{ quiz.title }}
-            </span>
+            </div>
             <span class="text-lg font-medium mb-2">
                 {{ quiz.questions.length }} question(s)
             </span>
             <span class="text-lg font-medium mb-2">
-                {{ quiz.participantCount }} participants(s)
+                {{ quiz.participantCount }} participant(s)
             </span>
             <span>
                 <font-awesome-icon icon="circle-check" size="xl" />
                 Success rate
-                {{ quiz.correctRate }} %</span
+                {{ Math.round(quiz.correctRate) }} %</span
             >
         </div>
-        <div class="flex flex-col justify-between items-center">
-            <v-btn
-                @click="onView"
-                class="w-fit mt-4 px-4 py-2 bg-green-600 text-white rounded shadow hover:bg-green-700"
-            >
+        <div
+            class="flex justify-between mt-4 items-center md:flex-col lg:flex-col xl:flex-row md:gap-2 lg:gap-2 xl:gap-0"
+        >
+            <v-btn @click="onView" variant="outlined" color="green">
                 View Quiz
             </v-btn>
             <v-dialog max-width="500">
@@ -61,7 +65,8 @@
                     <v-btn
                         v-bind="activatorProps"
                         text="Share Quiz"
-                        class="mt-4 px-4 py-2 bg-green-600 text-white rounded shadow hover:bg-green-700"
+                        variant="outlined"
+                        color="green"
                     ></v-btn>
                 </template>
 
@@ -76,13 +81,20 @@
                                 class="border rounded-md"
                             ></vue-qr>
                             <div>Quiz: {{ quiz.title }}</div>
-                            <v-btn @click="CopyUrl" text="Copy link"></v-btn>
+                            <v-btn
+                                variant="outlined"
+                                color="green"
+                                @click="CopyUrl"
+                                text="Copy link"
+                            ></v-btn>
                         </div>
 
                         <v-card-actions>
                             <v-spacer></v-spacer>
 
                             <v-btn
+                                variant="outlined"
+                                color="green"
                                 text="Ok"
                                 @click="isActive.value = false"
                             ></v-btn>
@@ -96,6 +108,8 @@
 
 <script>
 import vueQr from "vue-qr/src/packages/vue-qr.vue";
+import { toast } from "vue3-toastify";
+import "vue3-toastify/dist/index.css";
 export default {
     components: { vueQr },
     props: {
@@ -106,11 +120,19 @@ export default {
     },
     methods: {
         onEdit() {
-            // Thực hiện hành động khi nhấn Edit
-            this.$emit("edit-quiz", this.quiz);
+            if (this.quiz.participantCount > 0) {
+                toast.warning("You can't edit a quiz that has been taken!");
+                return;
+            }
+            this.$router.push({
+                path: `/create-quiz/`,
+                query: {
+                    id: this.quiz._id,
+                    edit: true,
+                },
+            });
         },
         onRemove() {
-            // Thực hiện hành động khi nhấn Remove
             this.$emit("remove-quiz", this.quiz);
         },
         onView() {
@@ -121,8 +143,10 @@ export default {
                 await navigator.clipboard.writeText(
                     `localhost:8080/take-quiz/${this.quiz._id}`
                 );
+                toast.success("Copied to clipboard!");
             } catch (err) {
                 console.error("Failed to copy: ", err); // Xử lý lỗi
+                toast.success("Failed to copy!");
             }
         },
     },
@@ -138,5 +162,10 @@ export default {
 .title {
     color: black;
     font-weight: bold;
+}
+.nowrap {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 </style>

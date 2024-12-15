@@ -57,27 +57,31 @@
                 </div>
 
                 <!-- Submit Button -->
-                <button
+                <v-btn
+                    variant="tonal"
+                    color="green"
                     type="button"
                     @click="userRegister"
-                    class="w-full py-2 bg-green-600 text-white font-semibold rounded hover:bg-green-700"
+                    width="100%"
                 >
                     Register
-                </button>
+                </v-btn>
 
                 <div class="w-full flex justify-between items-center py-2">
-                    <div
+                    <v-btn
+                        variant="outlined"
+                        color="green"
                         @click="$router.push('/')"
-                        class="cursor-pointer border border-green-600 text-green-600 px-2 py-1 text-lg rounded hover:text-green-600"
                     >
                         Home
-                    </div>
-                    <div
+                    </v-btn>
+                    <v-btn
+                        variant="outlined"
+                        color="green"
                         @click="$router.push('/login')"
-                        class="cursor-pointer border border-green-600 text-green-600 px-2 py-1 text-lg rounded hover:text-green-600"
                     >
                         Login
-                    </div>
+                    </v-btn>
                 </div>
 
                 <!-- Error Message -->
@@ -87,46 +91,37 @@
             </form>
         </div>
     </div>
-
-    <CustomToast v-if="data.toast.show" v-bind="data.toast" />
 </template>
 
 <script setup>
 import axios from "../utils/axios";
-import CustomToast from "./CustomToast.vue";
+import { toast } from "vue3-toastify";
+import "vue3-toastify/dist/index.css";
 const data = {
     userName: "",
     passWord: "",
     confirm: "",
     loginError: "",
-    toast: { show: false, message: "", state: "", duration: 5000 },
-};
-
-const showToast = (message, state = "success", duration = 5000) => {
-    data.toast = { show: true, message, state, duration };
-    setTimeout(() => {
-        data.toast.show = false;
-    }, duration);
 };
 
 // Register function
 const userRegister = async () => {
     try {
         if (data.passWord !== data.confirm) {
-            showToast("Passwords do not match!", "warning");
+            toast.error("Passwords do not match!");
             return;
         }
         await axios.post(`/user/register`, {
             username: data.userName,
             password: data.passWord,
         });
-        showToast("Register successful!", "success");
+        toast.success("Register successful!");
         setTimeout(() => {
-            location.href = "/login";
+            this.$router.push("/login");
         }, 3000);
     } catch (error) {
+        toast.error(error.response?.data?.error);
         console.log(error);
-        showToast(error.response?.data?.error, "warning");
     }
 };
 </script>

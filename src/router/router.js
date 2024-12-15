@@ -27,12 +27,14 @@ const routes = [
         path: "/create-quiz",
         name: "QuizBuilderComponent",
         component: QuizBuilderComponent,
+        meta: { requiresAuth: true },
     },
     {
         path: "/manage-quiz/:id",
         name: "ManageQuizComponent",
         component: ManageQuizComponent,
         props: true,
+        meta: { requiresAuth: true },
     },
     {
         path: "/take-quiz/:id",
