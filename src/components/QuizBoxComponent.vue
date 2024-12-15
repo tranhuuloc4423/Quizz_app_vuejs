@@ -76,7 +76,7 @@
                             class="flex flex-col items-center justify-between gap-2"
                         >
                             <vue-qr
-                                :text="`localhost:8080/take-quiz/${quiz._id}`"
+                                :text="`https://quizz-app-vuejs.vercel.app/take-quiz/${quiz._id}`"
                                 :size="200"
                                 class="border rounded-md"
                             ></vue-qr>
