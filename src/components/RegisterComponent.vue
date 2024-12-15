@@ -94,6 +94,7 @@
 </template>
 
 <script setup>
+import router from "@/router/router";
 import axios from "../utils/axios";
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
@@ -117,7 +118,7 @@ const userRegister = async () => {
         });
         toast.success("Register successful!");
         setTimeout(() => {
-            this.$router.push("/login");
+            router.push("/login");
         }, 3000);
     } catch (error) {
         toast.error(error.response?.data?.error);

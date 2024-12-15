@@ -81,6 +81,7 @@ import { reactive } from "vue";
 import axios from "../utils/axios";
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
+import router from "@/router/router";
 
 // Reactive state
 const data = reactive({
@@ -100,7 +101,7 @@ const userLogin = async () => {
         localStorage.setItem("QuizAuth", res.data.token);
         localStorage.setItem("QuizUser", JSON.stringify(res.data.user));
         setTimeout(() => {
-            this.$router.push("/");
+            router.push("/");
         }, 1000);
     } catch (error) {
         console.error(error);

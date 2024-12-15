@@ -112,12 +112,15 @@
                     <div class="font-bold text-2xl">
                         <span
                             :class="
-                                result.correctRate < 50
+                                result?.correctRate < 50
                                     ? 'text-red-600'
                                     : 'text-green-600'
                             "
                             >{{
-                                (result.correctRate / 100) * questions.length
+                                Math.round(
+                                    (result?.correctRate / 100) *
+                                        questions.length
+                                )
                             }}</span
                         >
                         / {{ questions.length }}
@@ -323,6 +326,7 @@ export default {
                     quizId: this.quiz._id,
                     answers: this.answers,
                 };
+                console.log(data);
                 const res = await axios.post(`/participant/participate`, data);
                 console.log(res.data);
                 this.isFinished = true;
