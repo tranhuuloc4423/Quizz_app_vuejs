@@ -47,11 +47,9 @@
                         <div>
                             <v-chip
                                 :color="
-                                    Math.round(item.correctRate) >= 50
-                                        ? 'green'
-                                        : 'red'
+                                    item.correctRate >= 50 ? 'green' : 'red'
                                 "
-                                :text="item.correctRate"
+                                :text="Math.round(item.correctRate)"
                                 class="text-uppercase"
                                 size="small"
                                 label
@@ -62,11 +60,9 @@
                         <div>
                             <v-chip
                                 :color="
-                                    Math.round(item.incorrectRate) >= 50
-                                        ? 'green'
-                                        : 'red'
+                                    item.incorrectRate >= 50 ? 'green' : 'red'
                                 "
-                                :text="item.incorrectRate"
+                                :text="Math.round(item.incorrectRate)"
                                 class="text-uppercase"
                                 size="small"
                                 label
