@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const local = "http://localhost:8080";
+// const local = "http://localhost:8080";
 const vercel = "https://quizz-app-vuejs.vercel.app";
 
 let auth = localStorage.getItem("QuizAuth");
