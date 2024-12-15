@@ -1,7 +1,10 @@
 import axios from "axios";
 
+const local = "http://localhost:8080";
+const vercel = "https://quizz-app-vuejs.vercel.app";
+
 let auth = localStorage.getItem("QuizAuth");
-if (auth == "") location = "http://localhost:8080/login";
+if (auth == "") location = `${vercel}/login`;
 
 const instance = axios.create({
     baseURL: "https://quizz-app-backend-web.vercel.app",

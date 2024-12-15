@@ -141,7 +141,7 @@ export default {
         async CopyUrl() {
             try {
                 await navigator.clipboard.writeText(
-                    `localhost:8080/take-quiz/${this.quiz._id}`
+                    `https://quizz-app-vuejs.vercel.app/take-quiz/${this.quiz._id}`
                 );
                 toast.success("Copied to clipboard!");
             } catch (err) {
