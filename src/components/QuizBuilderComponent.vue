@@ -256,7 +256,7 @@ export default {
                 toast.success("Create Quiz successful!");
                 setTimeout(() => {
                     this.$router.push("/");
-                }, 2000);
+                }, 500);
             } catch (error) {
                 toast.error(error.response?.data?.error);
             } finally {
@@ -320,11 +320,14 @@ export default {
         },
 
         // ===== API Calls =====
-        async getQuiz() {
+        async getData() {
             try {
+                this.loading = true;
                 const { data } = await axios.get(`/quiz/${this.quizId}`);
                 this.quiz.name = data.title;
+                await this.getQuestions();
             } catch (error) {
+                this.loading = false;
                 console.error(error);
             }
         },
@@ -348,10 +351,7 @@ export default {
         if (id && edit) {
             this.isEdit = true;
             this.quizId = id;
-            this.loading = true;
-            this.getQuiz();
-            this.getQuestions();
-            this.loading = false;
+            this.getData();
         }
     },
 };

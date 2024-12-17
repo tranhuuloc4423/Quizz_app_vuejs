@@ -3,21 +3,23 @@ import axios from "axios";
 // const local = "http://localhost:8080";
 const vercel = "https://quizz-app-vuejs.vercel.app";
 
-let auth = localStorage.getItem("QuizAuth");
-if (auth == "") location = `${vercel}/login`;
+if (!localStorage.getItem("QuizAuth")) {
+    location.href = `${vercel}/login`;
+}
 
 const instance = axios.create({
     baseURL: "https://quizz-app-backend-web.vercel.app",
-    headers: { Authorization: "Bearer " + auth },
 });
 
 instance.interceptors.request.use(
     function (config) {
-        // Do something before request is sent
+        const auth = localStorage.getItem("QuizAuth");
+        if (auth) {
+            config.headers.Authorization = "Bearer " + auth;
+        }
         return config;
     },
     function (error) {
-        // Do something with request error
         return Promise.reject(error);
     }
 );

@@ -11,7 +11,6 @@ const routes = [
         path: "/",
         name: "HomeComponent",
         component: HomeComponent,
-        // meta: { requiresAuth: true },
     },
     {
         path: "/login",
@@ -55,13 +54,11 @@ const router = createRouter({
 
 // Middleware kiểm tra đăng nhập
 router.beforeEach((to, from, next) => {
-    const isAuthenticated = localStorage.getItem("QuizAuth"); // Hoặc kiểm tra token từ store
+    const isAuthenticated = localStorage.getItem("QuizAuth");
 
     if (to.meta.requiresAuth && !isAuthenticated) {
-        // Nếu cần đăng nhập mà chưa đăng nhập, điều hướng về trang login
         next("/login");
     } else {
-        // Nếu đã đăng nhập hoặc không cần bảo mật, cho phép điều hướng
         next();
     }
 });
