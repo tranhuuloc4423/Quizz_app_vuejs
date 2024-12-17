@@ -320,12 +320,11 @@ export default {
         },
 
         // ===== API Calls =====
-        async getData() {
+        async getQuiz() {
             try {
                 this.loading = true;
                 const { data } = await axios.get(`/quiz/${this.quizId}`);
                 this.quiz.name = data.title;
-                await this.getQuestions();
             } catch (error) {
                 this.loading = false;
                 console.error(error);
@@ -346,12 +345,15 @@ export default {
         },
     },
 
-    mounted() {
+    async mounted() {
         const { id, edit } = this.$route?.query;
-        if (id && edit) {
+        if (id || edit) {
             this.isEdit = true;
             this.quizId = id;
-            this.getData();
+            this.loading = true;
+            await this.getQuiz();
+            await this.getQuestions();
+            this.loading = false;
         }
     },
 };
