@@ -4,7 +4,7 @@ import axios from "axios";
 const vercel = "https://quizz-app-vuejs.vercel.app";
 
 if (!localStorage.getItem("QuizAuth")) {
-    location.href = `${vercel}/login`;
+    location.href = `${vercel}/`;
 }
 
 const instance = axios.create({
