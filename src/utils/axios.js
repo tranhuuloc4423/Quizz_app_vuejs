@@ -1,22 +1,23 @@
 import axios from "axios";
 
-// const local = "http://localhost:8080";
+// URL của trang và API backend
 const vercel = "https://quizz-app-vuejs.vercel.app";
-
-if (!localStorage.getItem("QuizAuth")) {
-    location.href = `${vercel}/`;
-}
 
 const instance = axios.create({
     baseURL: "https://quizz-app-backend-web.vercel.app",
 });
 
+// Interceptor để cập nhật Authorization header trước mỗi request
 instance.interceptors.request.use(
     function (config) {
+        // Lấy token từ localStorage
         const auth = localStorage.getItem("QuizAuth");
+
+        // Nếu có token, thêm vào header Authorization
         if (auth) {
             config.headers.Authorization = "Bearer " + auth;
         }
+
         return config;
     },
     function (error) {
@@ -24,16 +25,21 @@ instance.interceptors.request.use(
     }
 );
 
-// Add a response interceptor
+// Interceptor để xử lý lỗi phản hồi
 instance.interceptors.response.use(
     function (response) {
-        // Any status code that lie within the range of 2xx cause this function to trigger
-        // Do something with response data
         return response;
     },
     function (error) {
-        // Any status codes that falls outside the range of 2xx cause this function to trigger
-        // Do something with response error
+        // Nếu gặp lỗi 401 hoặc 403 (unauthorized/forbidden), chuyển hướng đến trang login
+        if (
+            error.response &&
+            (error.response.status === 401 || error.response.status === 403)
+        ) {
+            if (location.pathname !== "/login") {
+                location.href = `${vercel}/login`;
+            }
+        }
         return Promise.reject(error);
     }
 );
