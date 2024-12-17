@@ -256,7 +256,7 @@ export default {
                 toast.success("Create Quiz successful!");
                 setTimeout(() => {
                     this.$router.push("/");
-                }, 500);
+                }, 200);
             } catch (error) {
                 toast.error(error.response?.data?.error);
             } finally {
@@ -274,7 +274,7 @@ export default {
                 toast.success("Update Quiz successful!");
                 setTimeout(() => {
                     this.$router.push("/");
-                }, 2000);
+                }, 200);
             } catch (error) {
                 toast.error(error.response?.data?.error);
             } finally {
