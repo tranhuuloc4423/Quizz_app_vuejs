@@ -2,6 +2,7 @@ import axios from "axios";
 
 // URL của trang và API backend
 const vercel = "https://quizz-app-vuejs.vercel.app";
+// const local = "https://quizz-app-vuejs.vercel.app";
 
 const instance = axios.create({
     baseURL: "https://quizz-app-backend-web.vercel.app",

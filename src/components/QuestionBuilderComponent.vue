@@ -1,7 +1,9 @@
 <template>
     <div class="border border-gray-300 p-4 rounded-md">
         <!-- Question Header -->
-        <div class="flex justify-between items-center mb-4 gap-4">
+        <div
+            class="flex justify-center flex-wrap items-center mb-4 gap-4 sm:flex-col md:flex-row md:justify-between"
+        >
             <h3 class="text-lg font-semibold">Question {{ index + 1 }}</h3>
 
             <!-- Input for Question Text -->
@@ -26,7 +28,7 @@
         <div
             v-for="(choice, choiceIndex) in localQuestion.choices"
             :key="choiceIndex"
-            class="flex items-center space-x-4 mb-3"
+            class="flex items-center space-x-4 mb-3 flex-wrap justify-center"
         >
             <!-- Choice Input -->
             <input

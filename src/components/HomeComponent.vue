@@ -1,10 +1,14 @@
 <template>
-    <div class="text-center h-screen flex pt-10 justify-center bg-gray-100">
+    <div class="text-center h-screen flex pt-10 justify-center">
         <div class="w-full max-w-screen-xl mx-4 md:px-0 lg:px-0 xl:px-0">
             <!-- header -->
-            <div class="flex items-center justify-between mb-6">
+            <div
+                class="w-full flex items-center sm:justify-center 2xs:gap-2 md:gap-0 flex-col md:justify-between md:flex-row mb-6"
+            >
                 <!-- Logo -->
-                <div class="flex items-center gap-4">
+                <div
+                    class="flex flex-col md:flex-row lg:flex-row xl:flex-row items-center gap-4"
+                >
                     <!-- logo here -->
                     <h3 class="ml-3 text-2xl font-bold text-black">
                         Quizz<span class="text-green-800">World</span>
@@ -20,7 +24,10 @@
 
                 <!-- Login Button -->
                 <div class="flex items-center gap-2">
-                    <div class="text-xl font-semibold" v-if="auth">
+                    <div
+                        class="text-xl font-semibold hidden md:block lg:block xl:block"
+                        v-if="auth"
+                    >
                         <span class="">Welcome back</span>
                         {{ user?.username }} !
                     </div>
@@ -31,7 +38,7 @@
             </div>
 
             <!-- Main Content -->
-            <div class="">
+            <div class="mt-4">
                 <div v-if="!auth">
                     <h1 class="text-5xl font-extrabold text-black mb-4">
                         Learn 10x <span class="text-green-800">Faster!</span>
@@ -49,7 +56,7 @@
                     </button>
                 </div>
 
-                <div v-if="auth">
+                <div v-if="auth" class="sm:px-8 md:px-0">
                     <div
                         v-if="loading"
                         class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6"
@@ -63,7 +70,7 @@
                         ></v-skeleton-loader>
                     </div>
                     <div
-                        class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6"
+                        class="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
                     >
                         <div v-for="(quiz, index) in quizzes" :key="index">
                             <QuizBoxComponent

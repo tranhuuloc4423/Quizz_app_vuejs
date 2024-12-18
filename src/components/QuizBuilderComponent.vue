@@ -36,9 +36,11 @@
             <!-- Bulk Add Questions -->
             <div
                 v-if="!isEdit && isBulkMode"
-                class="mb-5 border border-gray-300 rounded-lg p-4"
+                class="mb-5 border border-gray-300 rounded-lg p-4 w-full"
             >
-                <div class="flex justify-between items-center pb-2">
+                <div
+                    class="w-full flex sm:justify-center items-center pb-2 flex-col md:flex-row md:justify-between"
+                >
                     <h3 class="text-lg font-semibold">Bulk Questions</h3>
                     <v-btn
                         variant="outlined"

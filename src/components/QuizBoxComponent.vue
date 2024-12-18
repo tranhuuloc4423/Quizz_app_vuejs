@@ -55,9 +55,14 @@
             >
         </div>
         <div
-            class="flex justify-between mt-4 items-center md:flex-col lg:flex-col xl:flex-row md:gap-2 lg:gap-2 xl:gap-0"
+            class="flex justify-between mt-4 items-center flex-col gap-2 xl:gap-0 xl:flex-row"
         >
-            <v-btn @click="onView" variant="outlined" color="green">
+            <v-btn
+                @click="onView"
+                variant="outlined"
+                color="green"
+                class="w-full xl:w-[45%]"
+            >
                 View Quiz
             </v-btn>
             <v-dialog max-width="500">
@@ -67,6 +72,7 @@
                         text="Share Quiz"
                         variant="outlined"
                         color="green"
+                        class="w-full xl:w-[45%]"
                     ></v-btn>
                 </template>
 

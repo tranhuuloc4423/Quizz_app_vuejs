@@ -1,6 +1,8 @@
 <template>
-    <div class="h-screen w-full flex justify-center items-center">
-        <div class="h-fit w-1/5 bg-white p-6 rounded-lg shadow-lg border">
+    <div class="h-screen flex justify-center items-center px-8">
+        <div
+            class="h-fit md:w-[400px] lg:w-[400px] xl:w-[400px] w-[300px] bg-white p-6 rounded-lg shadow-lg border"
+        >
             <div class="text-center mb-2 text-2xl font-bold text-green-600">
                 Register
             </div>
@@ -67,10 +69,13 @@
                     Register
                 </v-btn>
 
-                <div class="w-full flex justify-between items-center py-2">
+                <div
+                    class="w-full flex justify-between items-center gap-2 py-2 flex-col md:flex-row lg:flex-row xl:flex-row"
+                >
                     <v-btn
                         variant="outlined"
                         color="green"
+                        class="w-full md:w-fit lg:w-fit xl:w-fit"
                         @click="$router.push('/')"
                     >
                         Home
@@ -78,6 +83,7 @@
                     <v-btn
                         variant="outlined"
                         color="green"
+                        class="w-full md:w-fit lg:w-fit xl:w-fit"
                         @click="$router.push('/login')"
                     >
                         Login
