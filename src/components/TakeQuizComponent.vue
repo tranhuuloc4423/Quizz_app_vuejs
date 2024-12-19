@@ -32,7 +32,7 @@
                             .answers"
                         :key="index"
                         @click="selectAnswer(option._id)"
-                        class="py-4 px-6 rounded text-left text-2xl"
+                        class="py-4 px-6 rounded text-left text-2xl border"
                         :class="{
                             'bg-green-200 transition-colors':
                                 selectedAnswer === option._id,
@@ -189,30 +189,6 @@
                         }"
                     >
                         {{ answer.answerText }}
-
-                        <div
-                            v-if="
-                                answer.isCorrect &&
-                                answer._id === question.answer._id
-                            "
-                            class="absolute top-0 left-0 w-full h-full flex items-center justify-center bg-[rgba(0,0,0,0.1)] text-sm font-bold"
-                        >
-                            Your Correct Answer
-                        </div>
-
-                        <div
-                            v-else-if="answer._id === question.answer._id"
-                            class="absolute top-0 left-0 w-full h-full flex items-center justify-center bg-[rgba(0,0,0,0.1)] text-sm font-bold"
-                        >
-                            Your Answer
-                        </div>
-
-                        <div
-                            v-else-if="answer.isCorrect"
-                            class="absolute top-0 left-0 w-full h-full flex items-center justify-center bg-[rgba(0,0,0,0.1)] text-sm font-bold"
-                        >
-                            Correct Answer
-                        </div>
                     </div>
                 </div>
             </div>
